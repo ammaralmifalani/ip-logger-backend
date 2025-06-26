@@ -18,7 +18,9 @@ app.get("/log-ip", async (req, res) => {
   console.log("📥 IP-bezoek:", ip);
 
   try {
-    const response = await fetch(`https://ipinfo.io/${ip}?token=${IPINFO_TOKEN}`);
+    const response = await fetch(
+      `https://ipinfo.io/${ip}?token=${IPINFO_TOKEN}`
+    );
     const data = await response.json();
 
     const city = data.city || "onbekend";
