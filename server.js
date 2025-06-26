@@ -1,9 +1,14 @@
 const express = require("express");
 const fetch = require("node-fetch");
+const cors = require("cors");
 
 const app = express();
 app.use(express.json());
-
+app.use(
+  cors({
+    origin: "https://craftedbyammar.vercel.app",
+  })
+);
 const PORT = process.env.PORT || 3000;
 const IPINFO_TOKEN = "de88af926fdda7"; // jouw API token
 
