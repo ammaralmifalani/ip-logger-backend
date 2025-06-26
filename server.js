@@ -5,8 +5,8 @@ const app = express();
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
+const IPINFO_TOKEN = "de88af926fdda7"; // jouw API token
 
-// 🔍 IP-log endpoint
 app.get("/log-ip", async (req, res) => {
   const ip =
     req.headers["x-forwarded-for"]?.split(",")[0] ||
@@ -18,34 +18,32 @@ app.get("/log-ip", async (req, res) => {
   console.log("📥 IP-bezoek:", ip);
 
   try {
-    const response = await fetch(`https://ipapi.co/${ip}/json/`);
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
+    const response = await fetch(`https://ipinfo.io/${ip}?token=${IPINFO_TOKEN}`);
     const data = await response.json();
-    const city = data?.city || "onbekend";
-    const country = data?.country_name || "onbekend";
+
+    const city = data.city || "onbekend";
+    const country = data.country || "onbekend";
 
     console.log(`🌍 Locatie: ${city}, ${country}`);
-    res.status(200).send(`✅ IP gelogd: ${city}, ${country}`);
   } catch (err) {
     console.warn("❌ Locatie ophalen mislukt:", err.message);
-    res.status(500).send("❌ Fout bij ophalen van locatiegegevens");
   }
+
+  res.send("✅ IP gelogd");
 });
 
-// 📍 Locatie-log endpoint via browser
 app.post("/log-location", (req, res) => {
   const { lat, lon } = req.body;
 
-  if (typeof lat === "number" && typeof lon === "number") {
+  if (lat && lon) {
     const mapUrl = `https://www.google.com/maps?q=${lat},${lon}`;
     console.log(`📍 Gebruiker locatie: ${lat}, ${lon}`);
     console.log(`🗺️ Google Maps link: ${mapUrl}`);
-    res.status(200).send("📌 Locatie ontvangen en gelogd");
   } else {
-    console.warn("⚠️ Coördinaten ontbreken of ongeldig:", req.body);
-    res.status(400).send("⚠️ Ongeldige locatiegegevens");
+    console.warn("⚠️ Coördinaten ontbreken of ongeldig.");
   }
+
+  res.send("Locatie ontvangen");
 });
 
 app.listen(PORT, () => {
